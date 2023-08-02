@@ -15,7 +15,6 @@ const Projects = () => {
 
   const getProjectsData = async (): Promise<void> => {
     const projectsData = await getAll();
-    console.log(projectsData);
     setProjects(projectsData);
   };
 
@@ -62,7 +61,9 @@ const Projects = () => {
         </Modal>
       )}
 
-      <ProjectsTable projects={projects} />
+      {projects.length > 0 && (
+        <ProjectsTable projectsData={projects} />
+      )}
     </>
   );
 };

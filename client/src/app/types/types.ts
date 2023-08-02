@@ -13,8 +13,15 @@ export interface Project {
 
 export interface Task {
   id: number;
+  status: string;
   name: string;
   description: string;
   dateAdded: Date;
-  timeSpent: string;
+  timeSpent: string | null;
+}
+
+export enum TASK_STATUS_TYPE {
+  DONE = 'Done',
+  INPROGRESS = 'In Progress',
+  PENDING = 'Pending',
 }

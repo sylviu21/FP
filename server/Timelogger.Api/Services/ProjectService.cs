@@ -17,7 +17,7 @@ namespace Timelogger.Api.Services
             Date = ConvertToFormattedDate(new DateTime(2022, 1, 1)),
             TimeSpent = new TimeSpentDto { Hours = 10, Minutes = 30 },
             Client = "Client 1",
-            Deadline = ConvertToFormattedDate(new DateTime(2022, 12, 31))
+            Deadline = ConvertToFormattedDate(new DateTime(2023, 12, 31))
         },
         new ProjectDto
         {
