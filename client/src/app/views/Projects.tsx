@@ -1,13 +1,34 @@
-import React from "react";
-import Table from "../components/Table";
+import React, { useState, useEffect } from "react";
+import ProjectsTable from "../components/ProjectsTable";
+import Modal from "../components/Modal";
+import AddEntryForm from "../forms/AddEntryForm";
+import { getAll } from '../api/projects';
+import { Project } from "../types/types";
 
-export default function Projects() {
+const Projects = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [projects, setProjects] = useState<Project[]>([]);
+    
+    const handleAddEntryClick = () => {
+        setIsModalOpen(!isModalOpen);
+    }
+
+    const getProjectsData = async (): Promise<void> => {
+        const projectsData = await getAll();
+        console.log(projectsData);
+        setProjects(projectsData);
+    }
+
+    useEffect( () => {
+        getProjectsData()
+    }, []);
+
     return (
         <>
             <div className="flex items-center my-6">
                 <div className="w-1/2">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Add entry
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleAddEntryClick}>
+                        Add Project
                     </button>
                 </div>
 
@@ -28,8 +49,14 @@ export default function Projects() {
                     </form>
                 </div>
             </div>
+            {isModalOpen && (
+            <Modal title="Add entry" onClose={() => setIsModalOpen(false)} isOpen={isModalOpen} >
+                <AddEntryForm onSubmit={() => setIsModalOpen(false)} />
+            </Modal>
+            )}
 
-            <Table />
+            <ProjectsTable projects={projects} />
         </>
     );
 }
+export default Projects;
