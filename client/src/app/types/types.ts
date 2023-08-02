@@ -12,9 +12,9 @@ export interface Project {
 }
 
 export interface Task {
-  id: string;
-  title: string;
+  id: number;
+  name: string;
   description: string;
   dateAdded: Date;
-  timeSpent: number;
+  timeSpent: string;
 }
