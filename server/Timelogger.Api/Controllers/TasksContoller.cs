@@ -3,25 +3,25 @@
 namespace Timelogger.Api.Controllers
 {
   [Route("api/[controller]")]
-  public class ProjectsController : Controller
+  public class TasksController : Controller
   {
     private readonly ApiContext _context;
 
-    public ProjectsController(ApiContext context)
+    public TasksController(ApiContext context)
     {
       _context = context;
     }
 
     [HttpGet]
     [Route("tasks")]
-    public IActionResult GetTasks()
+    public string HelloWorld()
     {
-      return Ok(_context.Tasks);
+      return "Hello Back!222";
     }
 
     // GET api/projects
     [HttpGet]
-    public IActionResult GetProjects()
+    public IActionResult Get()
     {
       return Ok(_context.Projects);
     }

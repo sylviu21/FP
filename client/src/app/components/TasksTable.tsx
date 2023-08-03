@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Task, TASK_STATUS_TYPE } from '../types/types';
 import Pagination from './Pagination';
+import { setStatusLabelColor } from '../utils/statusColor';
 
 interface ITasksTableProps {
   tasksData: Task[];
@@ -68,7 +69,7 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
               className={
                 selectedFilter === 'All'
                   ? 'selected'
-                  : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 '
+                  : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-white hover:bg-100 '
               }
             >
               <p>All</p>
@@ -82,7 +83,7 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
               className={
                 selectedFilter === 'Done'
                   ? 'selected'
-                  : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 '
+                  : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-green-200 '
               }
             >
               <p>Done</p>
@@ -110,7 +111,7 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
               className={
                 selectedFilter === 'Pending'
                   ? 'selected'
-                  : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 '
+                  : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-yellow-100 '
               }
             >
               <p>Pending</p>
@@ -119,7 +120,7 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
         </div>
         <button
           // onClick={() => popuphandler(true)}
-          className='focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded'
+          className='mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded'
         >
           <p className='text-sm font-medium leading-none text-white'>
             Add Task
@@ -181,37 +182,19 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
                               </p>
                             </div>
                           </td>
-                          {/* <td width='100' className='pl-24'>
-                            <div className='flex items-center'>
-                              <svg
-                                xmlns='http://www.w3.org/2000/svg'
-                                width='20'
-                                height='20'
-                                viewBox='0 0 20 20'
-                                fill='none'
-                              >
-                                <path
-                                  d='M9.16667 2.5L16.6667 10C17.0911 10.4745 17.0911 11.1922 16.6667 11.6667L11.6667 16.6667C11.1922 17.0911 10.4745 17.0911 10 16.6667L2.5 9.16667V5.83333C2.5 3.99238 3.99238 2.5 5.83333 2.5H9.16667'
-                                  stroke='#52525B'
-                                  stroke-width='1.25'
-                                  stroke-linecap='round'
-                                  stroke-linejoin='round'
-                                ></path>
-                                <circle
-                                  cx='7.50004'
-                                  cy='7.49967'
-                                  r='1.66667'
-                                  stroke='#52525B'
-                                  stroke-width='1.25'
-                                  stroke-linecap='round'
-                                  stroke-linejoin='round'
-                                ></circle>
-                              </svg>
-                              <p className='text-sm leading-none text-gray-600 ml-2'>
-                                Urgent
+                          <td width='150' className='pl-10'>
+                            <div className='flex space-x-2 md:justify-end md:items-center items-center justify-end'>
+                              <p className='text-base leading-4 dark:text-gray-300 text-gray-600 font-normal'>
+                                {task.status}
                               </p>
+                              <div
+                                className={
+                                  'w-3 h-3 rounded-full shadow ' +
+                                  setStatusLabelColor(task.status)
+                                }
+                              ></div>
                             </div>
-                          </td> */}
+                          </td>
                           <td width='100' className='pl-4'>
                             <div className='flex justify-end'>
                               <button className='focus:ring-2 focus:ring-offset-2 focus:ring-red-300 text-sm leading-none text-gray-600 py-3 px-5 bg-gray-100 rounded hover:bg-gray-200 focus:outline-none'>
@@ -219,7 +202,7 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
                               </button>
                             </div>
                           </td>
-                          <td width='100'>
+                          <td width='70'>
                             <div className='flex justify-end relative px-5 pt-2'>
                               <button
                                 className='focus:ring-2 rounded-md focus:outline-none'

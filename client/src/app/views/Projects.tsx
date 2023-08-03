@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import ProjectsTable from '../components/ProjectsTable';
-import Modal from '../components/Modal';
-import AddEntryForm from '../forms/AddEntryForm';
-import { getAll } from '../api/projects';
-import { Project } from '../types/types';
+import ProjectsTable from 'app/components/ProjectsTable';
+import Modal from 'app/components/Modal';
+import AddEntryForm from 'app/forms/AddProjectForm';
+import { getAllProjects } from 'app/api/projects';
+import { useAppSelector, useAppDispatch } from '../utils/';
+import { setProjects } from 'app/store/slices';
 
 const Projects = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const { projects } = useAppSelector((state) => state.projects);
+  const dispatch = useAppDispatch();
 
   const handleAddEntryClick = () => {
     setIsModalOpen(!isModalOpen);
   };
 
   const getProjectsData = async (): Promise<void> => {
-    const projectsData = await getAll();
-    setProjects(projectsData);
+    try {
+      const projectsData = await getAllProjects();
+      dispatch(setProjects(projectsData));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

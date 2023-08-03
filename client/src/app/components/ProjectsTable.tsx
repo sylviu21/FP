@@ -1,62 +1,12 @@
 import React, { FC, Fragment, useState, useEffect } from 'react';
 import TasksTable from './TasksTable';
-import { Project, Task, TASK_STATUS_TYPE } from '../types/types';
+import { Project, Task } from '../types/types';
+import { getAllTasks } from '../api/projects';
 // import { getTasksByProject } from '../api/projects';
 
 interface IProjectsTableProps {
   projectsData: Project[];
 }
-
-const mockTasks: Task[] = [
-  {
-    id: 1,
-    status: TASK_STATUS_TYPE.DONE,
-    name: 'Task 1',
-    description: 'Task 1 description',
-    dateAdded: new Date(),
-    timeSpent: '2h 30m',
-  },
-  {
-    id: 2,
-    status: TASK_STATUS_TYPE.INPROGRESS,
-    name: 'Task 2',
-    description: 'Task 2 description',
-    dateAdded: new Date(),
-    timeSpent: null,
-  },
-  {
-    id: 3,
-    status: TASK_STATUS_TYPE.DONE,
-    name: 'Task 3',
-    description: 'Task 3 description',
-    dateAdded: new Date(),
-    timeSpent: '2h 30m',
-  },
-  {
-    id: 4,
-    status: TASK_STATUS_TYPE.PENDING,
-    name: 'Task 4',
-    description: 'Task 4 description',
-    dateAdded: new Date(),
-    timeSpent: null,
-  },
-  {
-    id: 5,
-    status: TASK_STATUS_TYPE.PENDING,
-    name: 'Task 5',
-    description: 'Task 5 description',
-    dateAdded: new Date(),
-    timeSpent: null,
-  },
-  {
-    id: 6,
-    status: TASK_STATUS_TYPE.PENDING,
-    name: 'Task 6',
-    description: 'Task 6 description',
-    dateAdded: new Date(),
-    timeSpent: null,
-  },
-];
 
 const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
   const [selectedProject, setSelectedProject] =
@@ -67,6 +17,10 @@ const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
   const [projects, setProjects] = useState<Project[]>(projectsData);
   const [loadingTasks, setLoadingTasks] = useState<Boolean>(false);
 
+  useEffect(() => {
+    setProjects(projectsData);
+  }, [projectsData]);
+
   const handleProjectClick = (project: Project) => {
     // toggle Project selected
     if (selectedProject?.id !== project.id) {
@@ -76,16 +30,16 @@ const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
     }
   };
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (): Promise<void> => {
     if (selectedProject) {
       setLoadingTasks(true);
-
-      setTimeout(() => {
-        // const tasksData = await getTasksByProject(selectedProject.id);
-        // setTasks(tasksData);
-        setTasks(mockTasks);
+      try {
+        const tasksData = await getAllTasks();
+        setTasks(tasksData);
         setLoadingTasks(false);
-      }, 1000);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -160,11 +114,11 @@ const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
                 <tr>
                   <td className=''>
                     <div className='border-2 border-yellow-100 px-5 py-4 rounded bg-green-100 mb-5'>
-                      <div className='flex space-x-2 mb-5'>
-                        <div
-                          className='font-semibold text-2xl'
-                          onClick={() => handleProjectClick(project)}
-                        >
+                      <div
+                        className='flex space-x-2 mb-5 hover:cursor-pointer'
+                        onClick={() => handleProjectClick(project)}
+                      >
+                        <div className='font-semibold text-2xl'>
                           {project.name}
                         </div>
                         <div className='font-semibold text-gray-500 '>

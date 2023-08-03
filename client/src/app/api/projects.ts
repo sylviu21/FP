@@ -2,8 +2,13 @@ import { Project, Task } from "../types/types";
 
 const BASE_URL = "http://localhost:3001/api";
 
-export async function getAll(): Promise<Project[]> {
+export async function getAllProjects(): Promise<Project[]> {
     const response = await fetch(`${BASE_URL}/projects`);
+    return response.json();
+}
+
+export async function getAllTasks(): Promise<Task[]> {
+    const response = await fetch(`${BASE_URL}/projects/tasks`);
     return response.json();
 }
 

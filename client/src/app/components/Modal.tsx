@@ -6,15 +6,20 @@ interface ModalProps {
   title: string;
 }
 
-const Modal: FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+const Modal: FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+}) => {
   return (
     <div className={`modal ${isOpen ? 'open' : ''}`}>
-     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold">{title}</h2>
+      <div className='fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center'>
+        <div className='w-full max-w-sm mx-auto bg-white  rounded-lg p-8'>
+          <div className='flex justify-between items-center mb-4'>
+            <h2 className='text-lg font-bold'>{title}</h2>
             <button
-              className="text-gray-700 hover:text-gray-900"
+              className='text-gray-700 hover:text-gray-900'
               onClick={onClose}
             >
               X

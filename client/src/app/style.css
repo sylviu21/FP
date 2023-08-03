@@ -7,3 +7,13 @@
     @apply py-2 px-8 bg-white text-indigo-700
   }
 }
+
+body {
+  background: lightgray;
+}
+
+main > .container {
+  background: white;
+  padding: 20px;
+  margin: 50px auto;
+}

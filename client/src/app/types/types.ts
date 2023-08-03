@@ -1,12 +1,12 @@
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   date: string;
   timeSpent: {
     hours: number;
     minutes: number;
   };
-  description: string;
+  description?: string;
   client: string;
   deadline: string;
 }
