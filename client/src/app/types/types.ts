@@ -1,23 +1,19 @@
 export interface Project {
   id: string;
   name: string;
-  date: string;
-  timeSpent: {
-    hours: number;
-    minutes: number;
-  };
+  dateAdded: string;
   description?: string;
   client: string;
   deadline: string;
 }
 
 export interface Task {
-  id: number;
+  id: string;
   status: string;
   name: string;
-  description: string;
-  dateAdded: Date;
-  timeSpent: string | null;
+  description?: string;
+  dateAdded: string;
+  timeSpent?: string;
 }
 
 export enum TASK_STATUS_TYPE {

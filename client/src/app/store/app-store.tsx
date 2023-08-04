@@ -2,11 +2,12 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
-import { config, projects } from './slices';
+import { config, projects, tasks } from './slices';
 
 const reducer = {
   config,
   projects,
+  tasks,
 };
 
 const store = configureStore({

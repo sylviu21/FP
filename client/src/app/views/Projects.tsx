@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import ProjectsTable from 'app/components/ProjectsTable';
 import Modal from 'app/components/Modal';
-import AddEntryForm from 'app/forms/AddProjectForm';
 import { getAllProjects } from 'app/api/projects';
-import { useAppSelector, useAppDispatch } from '../utils/';
+import { useAppSelector, useAppDispatch } from 'app/custom-hooks';
 import { setProjects } from 'app/store/slices';
+import AddProjectForm from 'app/forms/AddProjectForm';
 
 const Projects = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { projects } = useAppSelector((state) => state.projects);
   const dispatch = useAppDispatch();
 
-  const handleAddEntryClick = () => {
+  const handleAddProject = () => {
     setIsModalOpen(!isModalOpen);
   };
 
@@ -34,7 +34,7 @@ const Projects = () => {
         <div className='w-1/2'>
           <button
             className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-            onClick={handleAddEntryClick}
+            onClick={handleAddProject}
           >
             Add Project
           </button>
@@ -59,11 +59,11 @@ const Projects = () => {
       </div>
       {isModalOpen && (
         <Modal
-          title='Add entry'
+          title='Add new project'
           onClose={() => setIsModalOpen(false)}
           isOpen={isModalOpen}
         >
-          <AddEntryForm onSubmit={() => setIsModalOpen(false)} />
+          <AddProjectForm onSubmit={() => setIsModalOpen(false)} />
         </Modal>
       )}
 

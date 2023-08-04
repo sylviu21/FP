@@ -1,7 +1,9 @@
-import React, { FC, Fragment, useState, useEffect } from 'react';
-import TasksTable from './TasksTable';
-import { Project, Task } from '../types/types';
+import React, { FC, useState, useEffect } from 'react';
+import { Project } from '../types/types';
 import { getAllTasks } from '../api/projects';
+import { useAppDispatch } from 'app/custom-hooks';
+import { setTasks } from 'app/store/slices';
+import ProjectsRow from './ProjectsRow';
 // import { getTasksByProject } from '../api/projects';
 
 interface IProjectsTableProps {
@@ -11,31 +13,23 @@ interface IProjectsTableProps {
 const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
   const [selectedProject, setSelectedProject] =
     useState<Project | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedSortOption, setSelectedSortOption] =
     useState<string>('latest');
   const [projects, setProjects] = useState<Project[]>(projectsData);
   const [loadingTasks, setLoadingTasks] = useState<Boolean>(false);
 
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     setProjects(projectsData);
   }, [projectsData]);
-
-  const handleProjectClick = (project: Project) => {
-    // toggle Project selected
-    if (selectedProject?.id !== project.id) {
-      setSelectedProject(project);
-    } else {
-      setSelectedProject(null);
-    }
-  };
 
   const fetchTasks = async (): Promise<void> => {
     if (selectedProject) {
       setLoadingTasks(true);
       try {
         const tasksData = await getAllTasks();
-        setTasks(tasksData);
+        dispatch(setTasks(tasksData));
         setLoadingTasks(false);
       } catch (error) {
         console.log(error);
@@ -101,77 +95,15 @@ const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
       </div>
       <table className='table-auto w-full'>
         <tbody>
-          {projects.map((project) => {
-            const targetDate = new Date(
-              project.deadline.split('/').reverse().join('-')
-            );
-            const currentDate = new Date();
-
-            const isPastDeadline = targetDate < currentDate;
-            const deadlineText = isPastDeadline ? 'Ended' : 'Due';
-            return (
-              <Fragment key={project.id}>
-                <tr>
-                  <td className=''>
-                    <div className='border-2 border-yellow-100 px-5 py-4 rounded bg-green-100 mb-5'>
-                      <div
-                        className='flex space-x-2 mb-5 hover:cursor-pointer'
-                        onClick={() => handleProjectClick(project)}
-                      >
-                        <div className='font-semibold text-2xl'>
-                          {project.name}
-                        </div>
-                        <div className='font-semibold text-gray-500 '>
-                          {project.client}
-                        </div>
-                      </div>
-                      <div className='flex justify-between mb-3'>
-                        <div className='flex font-semibold text-gray-600'>
-                          <svg
-                            xmlns='http://www.w3.org/2000/svg'
-                            className='h-6 w-6 mr-2'
-                            fill='none'
-                            viewBox='0 0 24 24'
-                            stroke='currentColor'
-                          >
-                            <path
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              strokeWidth='2'
-                              d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
-                            />
-                          </svg>
-                          6 h 30 mins
-                        </div>
-                        <div
-                          className={`flex font-semibold text-gray-600${
-                            isPastDeadline ? ' text-red-500' : ''
-                          }`}
-                        >
-                          {`${deadlineText}: ${project.deadline}`}
-                        </div>
-                      </div>
-                      <div className='flex'>
-                        <div className='w-2/12 h-2 bg-green-400 rounded-l-2xl'></div>
-                        <div className='w-7/12 h-2 bg-purple-500'></div>
-                        <div className='w-3/5 h-2 bg-yellow-400 rounded-r-2xl'></div>
-                      </div>
-
-                      {selectedProject?.id === project.id ? (
-                        loadingTasks ? (
-                          <div className='text-center font-semibold text-gray-600 py-4'>
-                            Loading tasks...
-                          </div>
-                        ) : (
-                          <TasksTable tasksData={tasks} />
-                        )
-                      ) : null}
-                    </div>
-                  </td>
-                </tr>
-              </Fragment>
-            );
-          })}
+          {projects.map((project) => (
+            <ProjectsRow
+              key={project.id}
+              project={project}
+              loadingTasks={loadingTasks}
+              selectedProject={selectedProject}
+              setSelectedProject={setSelectedProject}
+            />
+          ))}
         </tbody>
       </table>
     </div>
