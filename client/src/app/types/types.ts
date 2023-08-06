@@ -21,3 +21,8 @@ export enum TASK_STATUS_TYPE {
   INPROGRESS = 'In Progress',
   PENDING = 'Pending',
 }
+
+export type Config = {
+  projectOpen: boolean;
+  selectedSortOption: string;
+}

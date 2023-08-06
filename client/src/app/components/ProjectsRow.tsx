@@ -2,7 +2,6 @@ import React, { FC, Fragment } from 'react';
 import { Project } from '../types/types';
 
 import TasksTable from './TasksTable';
-import { useAppSelector } from 'app/custom-hooks';
 
 interface IProjectsRowProps {
   project: Project;
@@ -17,8 +16,6 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
   selectedProject,
   setSelectedProject,
 }) => {
-  const { tasks } = useAppSelector((state) => state.tasks);
-
   const targetDate = new Date(
     project.deadline.split('/').reverse().join('-')
   );
@@ -75,7 +72,11 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
                   isPastDeadline ? ' text-red-500' : ''
                 }`}
               >
-                {`${deadlineText}: ${project.deadline}`}
+                {`${deadlineText}: ${
+                  new Date(project.deadline)
+                    .toISOString()
+                    .split('T')[0]
+                }`}
               </div>
             </div>
             <div className='flex'>
@@ -90,7 +91,7 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
                   Loading tasks...
                 </div>
               ) : (
-                <TasksTable tasksData={tasks} />
+                <TasksTable />
               )
             ) : null}
           </div>

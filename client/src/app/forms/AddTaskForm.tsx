@@ -48,7 +48,7 @@ const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
       newErrors.name = 'Task name is required.';
     }
 
-    if (formData.status === 'Done') {
+    if (formData.status === 'Done' && !formData.timeSpent) {
       newErrors.timeSpent = 'Add time spent on task.';
     }
 

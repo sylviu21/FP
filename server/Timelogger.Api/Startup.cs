@@ -69,11 +69,11 @@ namespace Timelogger.Api
       }
     }
 
-    private static string ConvertToFormattedDate(DateTime inputDateString)
-    {
-      string formattedDate = inputDateString.ToString("dd/MM/yyyy");
-      return formattedDate;
-    }
+    // private static string DateTime inputDateString)
+    // {
+    //   string formattedDateAdded = inputDateString.ToString("dd/MM/yyyy");
+    //   return formattedDateAdded;
+    // }
 
     private static void SeedDatabase(IServiceScope scope)
     {
@@ -142,34 +142,67 @@ namespace Timelogger.Api
         {
             Id = 1,
             Name = "Project 1",
-            Date = ConvertToFormattedDate(new DateTime(2022, 1, 1)),
+            DateAdded = new DateTime(2022, 1, 1),
             Client = "Client 1",
-            Deadline = ConvertToFormattedDate(new DateTime(2023, 12, 31))
+            Deadline = new DateTime(2023, 12, 31)
         },
         new Project
         {
             Id = 2,
             Name = "Project 2",
-            Date = ConvertToFormattedDate(new DateTime(2022, 2, 1)),
+            DateAdded =new DateTime(2022, 2, 1),
             Client = "Client 2",
-            Deadline = ConvertToFormattedDate(new DateTime(2022, 3, 1))
+            Deadline = new DateTime(2022, 3, 1)
         },
         new Project
         {
             Id = 3,
             Name = "Project 3",
-            Date = ConvertToFormattedDate(new DateTime(2021, 12, 1)),
+            DateAdded = new DateTime(2021, 12, 1),
             Client = "Client 3",
-            Deadline = ConvertToFormattedDate(new DateTime(2022, 1, 15))
+            Deadline = new DateTime(2022, 1, 15)
         },
         new Project
         {
-            Id = 4,
-            Name = "Project 4",
-            Date = ConvertToFormattedDate(new DateTime(2022, 3, 1)),
-            Client = "Client 4",
-            Deadline = ConvertToFormattedDate(new DateTime(2022, 4, 1))
-        }
+          Id = 4,
+          Name = "Project 4",
+          DateAdded = new DateTime(2022, 3, 1),
+          Client = "Client 4",
+          Deadline = new DateTime(2022, 4, 1)
+        },
+
+        new Project
+        {
+          Id = 5,
+          Name = "Project 5",
+          DateAdded = new DateTime(2022, 1, 1),
+          Client = "Client 1",
+          Deadline = new DateTime(2023, 12, 31)
+        },
+        new Project
+        {
+          Id = 6,
+          Name = "Project 6",
+          DateAdded = new DateTime(2022, 2, 1),
+          Client = "Client 2",
+          Deadline = new DateTime(2022, 3, 1)
+        },
+        new Project
+        {
+          Id = 7,
+          Name = "Project 7",
+          DateAdded = new DateTime(2021, 12, 1),
+          Client = "Client 3",
+          Deadline = new DateTime(2022, 1, 15)
+        },
+        new Project
+        {
+          Id = 8,
+          Name = "Project 8",
+          DateAdded = new DateTime(2022, 3, 1),
+          Client = "Client 4",
+          Deadline = new DateTime(2022, 4, 1)
+        },
       };
 
       // Add the projects to the context

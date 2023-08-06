@@ -7,6 +7,12 @@ export async function getAllProjects(): Promise<Project[]> {
     return response.json();
 }
 
+export async function getPageProjects(page: number): Promise<{projects: Project[], isLastPage: boolean}> {
+    const response = await fetch(`${BASE_URL}/projects/${page}`);
+    return response.json();
+}
+
+
 export async function getAllTasks(): Promise<Task[]> {
     const response = await fetch(`${BASE_URL}/projects/tasks`);
     return response.json();

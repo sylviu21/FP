@@ -1,33 +1,44 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Task, TASK_STATUS_TYPE } from '../types/types';
 import Pagination from './Pagination';
 import TasksRow from './TasksRow';
 import Modal from './Modal';
 import AddTaskForm from 'app/forms/AddTaskForm';
 import TasksHeader from './TasksHeader';
+import { useAppSelector } from 'app/custom-hooks';
+import { sortArray } from 'app/utils';
 
 interface ITasksTableProps {
-  tasksData: Task[];
+  tasks: Task[];
 }
 
 const TASKS_PER_PAGE = 4;
 
-const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
+const TasksTable: FC = () => {
+  const { tasks: tasksData } = useAppSelector<ITasksTableProps>(
+    (state) => state.tasks
+  );
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const [tasks, setTasks] = useState<Task[]>(tasksData);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [toggleSort, setToggleSort] = useState<boolean>(false);
+  const [currentTasks, setCurrentTasks] = useState<Task[]>([]);
 
+  console.log(tasksData);
   const totalFilteredTasks = tasks.length;
   const total = Math.ceil(totalFilteredTasks / TASKS_PER_PAGE);
 
-  const indexOfLastTask = currentPage * TASKS_PER_PAGE;
-  const indexOfFirstTask = indexOfLastTask - TASKS_PER_PAGE;
-  let curTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+  useEffect(() => {
+    const indexOfLastTask = currentPage * TASKS_PER_PAGE;
+    const indexOfFirstTask = indexOfLastTask - TASKS_PER_PAGE;
+    let curTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+    setCurrentTasks(curTasks);
+  }, [currentPage, selectedFilter, toggleSort, tasks]);
 
   const filterTasks = (status: string) => {
     setSelectedFilter(status);
+
     let filteredTasks = [...tasks];
     switch (status) {
       case TASK_STATUS_TYPE.DONE:
@@ -63,22 +74,13 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
   const handleSort = (): void => {
     setToggleSort((prevValue) => !prevValue);
 
-    const sortedTasks = [...tasksData];
-    if (toggleSort) {
-      sortedTasks.sort((a, b) =>
-        new Date(b.dateAdded).getTime() -
-        new Date(a.dateAdded).getTime()
-          ? -1
-          : 1
-      );
-    } else {
-      sortedTasks.sort((a, b) =>
-        new Date(b.dateAdded).getTime() -
-        new Date(a.dateAdded).getTime()
-          ? 1
-          : -1
-      );
-    }
+    const sortedTasks = sortArray(
+      toggleSort ? 'ascending' : 'descending',
+      [...tasks],
+      'dateAdded'
+    );
+
+    console.log(sortedTasks);
     setTasks(sortedTasks);
   };
 
@@ -106,10 +108,11 @@ const TasksTable: FC<ITasksTableProps> = ({ tasksData }) => {
   return (
     <>
       <TasksHeader {...tasksHeaderProps} />
+
       <div className='bg-white p-5'>
         <table className='table-fixed w-full'>
           <tbody>
-            {curTasks.map((task) => (
+            {currentTasks.map((task) => (
               <TasksRow key={task.id} task={task} />
             ))}
           </tbody>

@@ -1,28 +1,40 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Project } from '../types/types';
+import { Config, Project } from '../types/types';
 import { getAllTasks } from '../api/projects';
-import { useAppDispatch } from 'app/custom-hooks';
-import { setTasks } from 'app/store/slices';
+import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
+import {
+  setProjects,
+  setSelectedSortOption,
+  setTasks,
+} from 'app/store/slices';
 import ProjectsRow from './ProjectsRow';
+import { sortArray } from 'app/utils/sortArray';
 // import { getTasksByProject } from '../api/projects';
 
 interface IProjectsTableProps {
   projectsData: Project[];
+  isLoading: boolean;
+  isLastPage: boolean;
+  error: string;
 }
 
-const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
+const ProjectsTable: FC<IProjectsTableProps> = ({
+  isLoading,
+  isLastPage,
+  error,
+}) => {
   const [selectedProject, setSelectedProject] =
     useState<Project | null>(null);
-  const [selectedSortOption, setSelectedSortOption] =
-    useState<string>('latest');
-  const [projects, setProjects] = useState<Project[]>(projectsData);
+  const { selectedSortOption } = useAppSelector<Config>(
+    (state) => state.config
+  );
+
+  const { projects } = useAppSelector<{ projects: Project[] }>(
+    (state) => state.projects
+  );
+
   const [loadingTasks, setLoadingTasks] = useState<Boolean>(false);
-
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    setProjects(projectsData);
-  }, [projectsData]);
 
   const fetchTasks = async (): Promise<void> => {
     if (selectedProject) {
@@ -44,25 +56,15 @@ const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
   const handleSortChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ): void => {
-    setSelectedSortOption(event.target.value);
+    dispatch(setSelectedSortOption(event.target.value));
 
-    const sortedProjects = [...projectsData];
-    if (event.target.value === 'latest') {
-      sortedProjects.sort((a, b) =>
-        new Date(b.deadline).getTime() -
-        new Date(a.deadline).getTime()
-          ? -1
-          : 1
-      );
-    } else if (event.target.value === 'oldest') {
-      sortedProjects.sort((a, b) =>
-        new Date(b.deadline).getTime() -
-        new Date(a.deadline).getTime()
-          ? 1
-          : -1
-      );
-    }
-    setProjects(sortedProjects);
+    const sortedProjects = sortArray(
+      event.target.value,
+      projects,
+      'deadline'
+    );
+
+    dispatch(setProjects(sortedProjects));
   };
 
   return (
@@ -106,6 +108,9 @@ const ProjectsTable: FC<IProjectsTableProps> = ({ projectsData }) => {
           ))}
         </tbody>
       </table>
+      {isLoading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+      {isLastPage && <p>No more projects to display.</p>}
     </div>
   );
 };

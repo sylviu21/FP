@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Timelogger.Api.Controllers
 {
@@ -25,5 +26,18 @@ namespace Timelogger.Api.Controllers
     {
       return Ok(_context.Projects);
     }
+
+    // GET api/projects/{page}
+    [HttpGet("{page}")]
+    public IActionResult GetProjectsByPage(int page)
+    {
+      int pageSize = 4;
+
+      var paginatedProjects = _context.Projects.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+      bool isLastPage = _context.Projects.Count() <= page * pageSize;
+      return Ok(new { projects = paginatedProjects, isLastPage });
+    }
+
   }
 }

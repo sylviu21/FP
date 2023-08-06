@@ -74,11 +74,11 @@ const AddProjectForm: FC<AddProjectFormProps> = ({ onSubmit }) => {
     // Create a new Project object using the properties from the formData
     const newProject: Project = {
       id: nanoid(),
-      dateAdded: new Date().toDateString(),
+      dateAdded: new Date().toISOString(),
       ...formData,
+      deadline: new Date(formData.deadline).toISOString(),
     };
 
-    console.log(onsubmit);
     onSubmit();
 
     dispatch(addProject(newProject));
