@@ -9,5 +9,7 @@ namespace Timelogger.Entities
 		public DateTime DateAdded { get; set; }
 		public string Client { get; set; }
 		public DateTime Deadline { get; set; }
+		public int TimeSpent { get; set; }
+
 	}
 }

@@ -83,57 +83,134 @@ namespace Timelogger.Api
         new Task
           {
               Id = 1,
+              ProjectId = 1,
               Status = "Done",
               Name = "Task 1",
               Description = "Task 1 description",
-              DateAdded = DateTime.Now,
+              DateAdded = new DateTime(2022, 1, 1),
               TimeSpent = "2h 30m"
           },
           new Task
           {
               Id = 2,
+              ProjectId = 1,
               Status = "In Progress",
               Name = "Task 2",
               Description = "Task 2 description",
-              DateAdded = DateTime.Now,
+              DateAdded = new DateTime(2022, 1, 2),
               TimeSpent = null
           },
           new Task
           {
               Id = 3,
+              ProjectId = 1,
               Status = "Done",
               Name = "Task 3",
               Description = "Task 3 description",
-              DateAdded = DateTime.Now,
+              DateAdded = new DateTime(2022, 1, 3),
               TimeSpent = "2h 30m"
           },
           new Task
           {
               Id = 4,
+              ProjectId = 1,
               Status = "Pending",
               Name = "Task 4",
               Description = "Task 4 description",
-              DateAdded = DateTime.Now,
+              DateAdded = new DateTime(2022, 1, 4),
               TimeSpent = null
           },
           new Task
           {
               Id = 5,
+              ProjectId = 1,
               Status = "Pending",
               Name = "Task 5",
               Description = "Task 5 description",
-              DateAdded = DateTime.Now,
+              DateAdded = new DateTime(2022, 1, 5),
               TimeSpent = null
           },
           new Task
           {
               Id = 6,
+              ProjectId = 1,
               Status = "Pending",
               Name = "Task 6",
               Description = "Task 6 description",
-              DateAdded = DateTime.Now,
+              DateAdded = new DateTime(2022, 1, 6),
               TimeSpent = null
+          },
+           new Task
+          {
+              Id = 7,
+              ProjectId = 2,
+              Status = "Done",
+              Name = "Task 1",
+              Description = "Task 1 description",
+              DateAdded = new DateTime(2022, 1, 7),
+              TimeSpent = "2h 30m"
+          },
+          new Task
+          {
+              Id = 8,
+              ProjectId = 3,
+              Status = "Done",
+              Name = "Task 1",
+              Description = "Task 1 description",
+              DateAdded = new DateTime(2022, 1, 8),
+              TimeSpent = "2h 30m"
+          },
+          new Task
+          {
+              Id = 9,
+              ProjectId = 4,
+              Status = "Done",
+              Name = "Task 1",
+              Description = "Task 1 description",
+              DateAdded = new DateTime(2022, 1, 9),
+              TimeSpent = "2h 30m"
+          },
+          new Task
+          {
+              Id = 10,
+              ProjectId = 5,
+              Status = "Done",
+              Name = "Task 1",
+              Description = "Task 1 description",
+              DateAdded = new DateTime(2022, 1, 10),
+              TimeSpent = "2h 30m"
+          },
+          new Task
+          {
+              Id = 11,
+              ProjectId = 6,
+              Status = "Done",
+              Name = "Task 1",
+              Description = "Task 1 description",
+              DateAdded = new DateTime(2022, 1, 11),
+              TimeSpent = "2h 30m"
+          },
+          new Task
+          {
+              Id = 12,
+              ProjectId = 7,
+              Status = "Done",
+              Name = "Task 1",
+              Description = "Task 1 description",
+              DateAdded = new DateTime(2022, 1, 11),
+              TimeSpent = "2h 30m"
+          },
+          new Task
+          {
+              Id = 13,
+              ProjectId = 8,
+              Status = "Done",
+              Name = "Task 1",
+              Description = "Task 1 description",
+              DateAdded = new DateTime(2022, 1, 11),
+              TimeSpent = "2h 30m"
           }
+
       };
 
       var projects = new List<Project>
@@ -144,7 +221,7 @@ namespace Timelogger.Api
             Name = "Project 1",
             DateAdded = new DateTime(2022, 1, 1),
             Client = "Client 1",
-            Deadline = new DateTime(2023, 12, 31)
+            Deadline = new DateTime(2023, 12, 31),
         },
         new Project
         {

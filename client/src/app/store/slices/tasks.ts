@@ -11,6 +11,17 @@ const reducers = {
   setTasks(state: {tasks: Task[]}, { payload }: PayloadAction<Task[]>) {
     state.tasks = payload;
   },
+  editTask(state: {tasks: Task[]}, { payload }: PayloadAction<Task>) {
+    state.tasks = state.tasks.map((task) => {
+      if (task.id === payload.id) {
+        return payload;
+      }
+      return task;
+    });
+  },
+  removeTask(state: {tasks: Task[]}, { payload }: PayloadAction<number>) {
+    state.tasks = state.tasks.filter((task) => task.id !== payload);
+  }
 };
 
 const tasksSlice = createSlice({
@@ -22,6 +33,8 @@ const tasksSlice = createSlice({
 export const {
   addTask,
   setTasks,
+  editTask,
+  removeTask,
 } = tasksSlice.actions;
 
 export const tasks = tasksSlice.reducer;

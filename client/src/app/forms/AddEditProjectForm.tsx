@@ -1,10 +1,10 @@
 import React, { FC, useState, ChangeEvent, FormEvent } from 'react';
-import { nanoid } from 'nanoid';
 import { addProject } from 'app/store/slices';
 import { Project } from 'app/types/types';
 import { useAppDispatch } from 'app/custom-hooks';
+import { randomId } from 'app/utils/randomId';
 
-interface AddProjectFormProps {
+interface AddEditProjectFormProps {
   onSubmit: () => void;
 }
 
@@ -16,11 +16,13 @@ interface FormProjectValues
   deadline: string;
 }
 
-const AddProjectForm: FC<AddProjectFormProps> = ({ onSubmit }) => {
+const AddEditProjectForm: FC<AddEditProjectFormProps> = ({
+  onSubmit,
+}) => {
   const [formData, setFormData] = useState<FormProjectValues>({
     name: '',
     description: '',
-    client: '',
+    client: 'Client 1',
     deadline: '',
   });
   const [errors, setErrors] = useState<
@@ -71,12 +73,10 @@ const AddProjectForm: FC<AddProjectFormProps> = ({ onSubmit }) => {
       return;
     }
 
-    // Create a new Project object using the properties from the formData
     const newProject: Project = {
-      id: nanoid(),
+      id: randomId(),
       dateAdded: new Date().toISOString(),
       ...formData,
-      deadline: new Date(formData.deadline).toISOString(),
     };
 
     onSubmit();
@@ -113,7 +113,6 @@ const AddProjectForm: FC<AddProjectFormProps> = ({ onSubmit }) => {
         )}
       </div>
 
-      {/* Add the missing form inputs */}
       <div className='mb-4'>
         <label
           className='block text-gray-700 text-sm font-bold mb-2'
@@ -187,4 +186,4 @@ const AddProjectForm: FC<AddProjectFormProps> = ({ onSubmit }) => {
   );
 };
 
-export default AddProjectForm;
+export default AddEditProjectForm;

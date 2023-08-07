@@ -16,7 +16,7 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
   return (
     <div className='sm:flex items-center justify-between bg-grey-500 mt-5'>
       <div className='flex'>
-        <button onClick={() => filterTasks('All')} className=''>
+        <button onClick={() => filterTasks('All')}>
           <div
             className={`flex  ${
               selectedFilter === 'All'
@@ -25,9 +25,9 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
             }`}
           >
             <span>All</span>
-            {selectedFilter === 'All' && showSort()}
           </div>
         </button>
+        {selectedFilter === 'All' && showSort()}
         <button
           className='ml-4 sm:ml-8'
           onClick={() => filterTasks('Done')}
@@ -49,7 +49,7 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
         >
           <div
             className={`flex  ${
-              selectedFilter === 'In progress'
+              selectedFilter === 'In Progress'
                 ? 'selected'
                 : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-200 hover:bg-100 '
             }`}

@@ -1,12 +1,28 @@
 import React, { FC } from 'react';
 import { Task } from 'app/types/types';
 import { setStatusLabelColor } from '../utils/statusColor';
+import { removeTask } from 'app/store/slices';
+import { useAppDispatch } from 'app/custom-hooks';
 
 interface ITasksRowProps {
   task: Task;
+  onEditForm?: () => void;
+  setEditTask?: (task: Task) => void;
 }
 
-const TasksRow: FC<ITasksRowProps> = ({ task }) => {
+const TasksRow: FC<ITasksRowProps> = ({
+  task,
+  onEditForm,
+  setEditTask,
+}) => {
+  const dispatch = useAppDispatch();
+  const deleteTask = () => dispatch(removeTask(task.id));
+
+  const editTask = () => {
+    onEditForm && onEditForm();
+    setEditTask && setEditTask(task);
+  };
+
   return (
     <>
       <tr key={task.id}>
@@ -76,7 +92,7 @@ const TasksRow: FC<ITasksRowProps> = ({ task }) => {
                   <td width='70' className='px-6 py-4'>
                     <div className='flex justify-end gap-4 h-4'>
                       <button
-                        onClick={() => {}}
+                        onClick={deleteTask}
                         role='button'
                         aria-label='option'
                       >
@@ -97,7 +113,7 @@ const TasksRow: FC<ITasksRowProps> = ({ task }) => {
                         </svg>
                       </button>
                       <button
-                        onClick={() => {}}
+                        onClick={editTask}
                         role='button'
                         aria-label='option'
                       >

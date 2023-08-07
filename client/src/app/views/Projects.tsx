@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import ProjectsTable from 'app/components/ProjectsTable';
+import Search from 'app/components/Search';
 import Modal from 'app/components/Modal';
-import { getAllProjects, getPageProjects } from 'app/api/projects';
+
 import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
+import AddEditProjectForm from 'app/forms/AddEditProjectForm';
 import { setProjects } from 'app/store/slices';
-import AddProjectForm from 'app/forms/AddProjectForm';
 import { Project } from 'app/types/types';
 import { sortArray } from 'app/utils';
-import Search from 'app/components/Search';
+import {
+  getAllProjects,
+  getPageProjects,
+  searchProject,
+} from 'app/api/projects';
+import LoadMore from 'app/components/LoadMore';
 
 const Projects = () => {
   const [isAllLoaded, setIstAllLoaded] = useState<boolean>(false);
@@ -20,7 +26,7 @@ const Projects = () => {
   const { projects } = useAppSelector<{ projects: Project[] }>(
     (state) => state.projects
   );
-  console.log('projects', projects);
+
   const { selectedSortOption } = useAppSelector<{
     selectedSortOption: string;
   }>((state) => state.config);
@@ -42,6 +48,7 @@ const Projects = () => {
         [...projects, ...projectsData],
         'deadline'
       );
+
       dispatch(setProjects(sortedProjects));
 
       setPage((prevPage) => prevPage + 1);
@@ -81,9 +88,11 @@ const Projects = () => {
     }
   };
 
-  const handleSearch = (value: string) => {
+  const handleSearch = async (searchInput: string): Promise<void> => {
     //create api endpoint for search
-    console.log('handleSearch', value);
+    const searchData = await searchProject(searchInput);
+    dispatch(setProjects(searchData));
+    setIstAllLoaded(true);
   };
   const projectTableProps = {
     projectsData: projects,
@@ -111,7 +120,9 @@ const Projects = () => {
           onClose={() => setIsModalOpen(false)}
           isOpen={isModalOpen}
         >
-          <AddProjectForm onSubmit={() => setIsModalOpen(false)} />
+          <AddEditProjectForm
+            onSubmit={() => setIsModalOpen(false)}
+          />
         </Modal>
       )}
 
@@ -119,21 +130,7 @@ const Projects = () => {
         <ProjectsTable {...projectTableProps} />
       )}
       {isLastPage || isAllLoaded ? null : (
-        <div className='flex justify-center items-center'>
-          <button
-            className='font-medium text-blue-600 dark:text-blue-500 hover:underline mr-5'
-            onClick={loadMore}
-          >
-            Load more
-          </button>
-          |
-          <button
-            className='font-medium text-blue-600 dark:text-blue-500 hover:underline ml-5'
-            onClick={loadAll}
-          >
-            Load all
-          </button>
-        </div>
+        <LoadMore loadMore={loadMore} loadAll={loadAll} />
       )}
     </>
   );

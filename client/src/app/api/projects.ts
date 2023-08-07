@@ -1,24 +1,22 @@
-import { Project, Task } from "../types/types";
-
-const BASE_URL = "http://localhost:3001/api";
+import { BASE_URL } from "app/utils";
+import { Project } from "../types/types";
 
 export async function getAllProjects(): Promise<Project[]> {
     const response = await fetch(`${BASE_URL}/projects`);
     return response.json();
 }
 
+// export async function getProject(productId: number): Promise<Project> {
+//     const response = await fetch(`${BASE_URL}/projects?productId=${productId}`);
+//     return response.json();
+// }
+
 export async function getPageProjects(page: number): Promise<{projects: Project[], isLastPage: boolean}> {
-    const response = await fetch(`${BASE_URL}/projects/${page}`);
+    const response = await fetch(`${BASE_URL}/projects/page/${page}`);
     return response.json();
 }
 
-
-export async function getAllTasks(): Promise<Task[]> {
-    const response = await fetch(`${BASE_URL}/projects/tasks`);
-    return response.json();
-}
-
-export async function getTasksByProject(projectId: number): Promise<Task[]> {
-    const response = await fetch(`${BASE_URL}/projects/${projectId}/tasks`);
+export async function searchProject(searchInput: string): Promise<Project[]> {
+    const response = await fetch(`${BASE_URL}/projects/search/${searchInput}`);
     return response.json();
 }

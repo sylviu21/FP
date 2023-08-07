@@ -3,7 +3,8 @@ import { Config } from 'app/types/types';
 
 const initialState: Config = {
   projectOpen: false,
-  selectedSortOption: 'latest'
+  selectedSortOption: 'latest',
+  selectedProject: { id: 0, timeSpent: 0 },
 };
 
 const reducers = {
@@ -12,7 +13,10 @@ const reducers = {
   },
   setSelectedSortOption: (state: Config, { payload }: PayloadAction<string>) => {
     state.selectedSortOption = payload;
-  }
+  },
+  setSelectedProjectDetails: (state: Config, { payload }: PayloadAction<{ id: number; timeSpent: number }>) => {
+    state.selectedProject = payload;
+  },
 };
 
 const configSlice = createSlice({
@@ -23,7 +27,8 @@ const configSlice = createSlice({
 
 export const {
   toggleProjectOpen,
-  setSelectedSortOption
+  setSelectedSortOption,
+  setSelectedProjectDetails,
 } = configSlice.actions;
 
 export const config = configSlice.reducer;

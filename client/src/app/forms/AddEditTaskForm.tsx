@@ -1,11 +1,17 @@
 import React, { FC, useState, ChangeEvent, FormEvent } from 'react';
-import { nanoid } from 'nanoid';
-import { addTask } from 'app/store/slices';
-import { Task } from 'app/types/types';
-import { useAppDispatch } from 'app/custom-hooks';
+import {
+  addTask,
+  editTask,
+  updateProjectTimeSpent,
+} from 'app/store/slices';
+import { Config, Task } from 'app/types/types';
+import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
+import { randomId } from 'app/utils/randomId';
+import { convertToMinutes } from 'app/utils';
 
-interface AddTaskFormProps {
+interface AddEditTaskFormProps {
   onSubmit: () => void;
+  task?: Task;
 }
 
 interface FormTaskValues
@@ -13,18 +19,31 @@ interface FormTaskValues
   name: string;
   description?: string;
   status: string;
+  projectId: number;
 }
 
-const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
-  const [formData, setFormData] = useState<FormTaskValues>({
-    name: '',
-    description: '',
-    status: 'Pending',
-    timeSpent: '',
-  });
+const AddEditTaskForm: FC<AddEditTaskFormProps> = ({
+  onSubmit,
+  task,
+}) => {
+  const { selectedProject } = useAppSelector<Config>(
+    (state) => state.config
+  );
+  const { id: projectId, timeSpent } = selectedProject;
+  const [formData, setFormData] = useState<FormTaskValues | Task>(
+    task
+      ? { ...task }
+      : {
+          name: '',
+          description: '',
+          status: 'Pending',
+          projectId: projectId,
+        }
+  );
   const [errors, setErrors] = useState<
     Partial<Record<keyof FormTaskValues, string>>
   >({});
+
   const dispatch = useAppDispatch();
 
   const handleChange = (
@@ -50,10 +69,12 @@ const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
 
     if (formData.status === 'Done' && !formData.timeSpent) {
       newErrors.timeSpent = 'Add time spent on task.';
+    } else if (formData.status === 'Done' && !isTimeSpentValid()) {
+      return false;
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if there are no errors
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -64,22 +85,95 @@ const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
     }
 
     const newTask: Task = {
-      id: nanoid(),
-      dateAdded: new Date().toDateString(),
+      id: randomId(),
+      dateAdded: new Date().toISOString(),
       ...formData,
     };
 
-    console.log(onsubmit);
+    const updatedTask: Task | null = task
+      ? {
+          id: task.id,
+          dateAdded: new Date().toISOString(),
+          ...formData,
+        }
+      : null;
+
     onSubmit();
 
-    dispatch(addTask(newTask));
+    task
+      ? dispatch(editTask(updatedTask as Task))
+      : dispatch(addTask(newTask));
+    const time = isNaN(Number(timeSpent)) ? 0 : timeSpent;
+    formData.timeSpent &&
+      dispatch(
+        updateProjectTimeSpent({
+          projectId,
+          timeSpent: convertToMinutes(formData.timeSpent) + time,
+        })
+      );
 
     setFormData({
       name: '',
       description: '',
       status: '',
-      timeSpent: '',
+      timeSpent: undefined,
+      projectId: projectId,
     });
+  };
+
+  const handleTimeSpentChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      timeSpent: '',
+    }));
+
+    const { value } = event.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      timeSpent: value,
+    }));
+  };
+
+  const isTimeSpentValid = (): boolean => {
+    const timePattern = /^\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*$/;
+
+    if (!formData.timeSpent) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        timeSpent: 'Time spent is required.',
+      }));
+      return false;
+    }
+
+    const matches = formData.timeSpent.match(timePattern);
+    if (!matches) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        timeSpent: 'Invalid time format. Use "2h 30m" format.',
+      }));
+      return false;
+    }
+
+    const hours = parseInt(matches[1], 10) || 0;
+    const minutes = parseInt(matches[2], 10) || 0;
+    if (
+      hours < 0 ||
+      minutes < 0 ||
+      minutes > 45 ||
+      (hours === 0 && minutes < 30) ||
+      minutes % 15 !== 0
+    ) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        timeSpent:
+          'Invalid time value. Minimum 30 minutes with 15 minute increments.',
+      }));
+      return false;
+    }
+
+    return true;
   };
 
   return (
@@ -104,7 +198,6 @@ const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
         )}
       </div>
 
-      {/* Add the missing form inputs */}
       <div className='mb-4'>
         <label
           className='block text-gray-700 text-sm font-bold mb-2'
@@ -148,7 +241,7 @@ const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
         )}
       </div>
 
-      {formData.status !== 'Pending' ? (
+      {formData.status === 'Done' ? (
         <div className='mb-4'>
           <label
             className='block text-gray-700 text-sm font-bold mb-2'
@@ -162,7 +255,7 @@ const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
             id='timeSpent'
             name='timeSpent'
             value={formData.timeSpent}
-            onChange={handleChange}
+            onChange={handleTimeSpentChange}
           />
           {errors.timeSpent && (
             <div className='text-red-600'>{errors.timeSpent}</div>
@@ -179,4 +272,4 @@ const AddTaskForm: FC<AddTaskFormProps> = ({ onSubmit }) => {
   );
 };
 
-export default AddTaskForm;
+export default AddEditTaskForm;

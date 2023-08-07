@@ -1,6 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Config, Project } from '../types/types';
-import { getAllTasks } from '../api/projects';
 import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
 import {
   setProjects,
@@ -9,7 +8,7 @@ import {
 } from 'app/store/slices';
 import ProjectsRow from './ProjectsRow';
 import { sortArray } from 'app/utils/sortArray';
-// import { getTasksByProject } from '../api/projects';
+import { getTasksByProject } from 'app/api/tasks';
 
 interface IProjectsTableProps {
   projectsData: Project[];
@@ -36,11 +35,11 @@ const ProjectsTable: FC<IProjectsTableProps> = ({
   const [loadingTasks, setLoadingTasks] = useState<Boolean>(false);
   const dispatch = useAppDispatch();
 
-  const fetchTasks = async (): Promise<void> => {
+  const fetchTasks = async (projectId: number): Promise<void> => {
     if (selectedProject) {
       setLoadingTasks(true);
       try {
-        const tasksData = await getAllTasks();
+        const tasksData = await getTasksByProject(projectId);
         dispatch(setTasks(tasksData));
         setLoadingTasks(false);
       } catch (error) {
@@ -50,7 +49,7 @@ const ProjectsTable: FC<IProjectsTableProps> = ({
   };
 
   useEffect(() => {
-    fetchTasks();
+    selectedProject?.id && fetchTasks(selectedProject.id);
   }, [selectedProject]);
 
   const handleSortChange = (
