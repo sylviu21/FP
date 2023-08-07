@@ -19,9 +19,6 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
   selectedProject,
   setSelectedProject,
 }) => {
-  console.log('====================================');
-  console.log(project);
-  console.log('====================================');
   const dispatch = useAppDispatch();
   const targetDate = new Date(
     project.deadline.split('/').reverse().join('-')

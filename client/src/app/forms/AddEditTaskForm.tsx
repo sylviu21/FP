@@ -1,7 +1,7 @@
 import React, { FC, useState, ChangeEvent, FormEvent } from 'react';
 import {
   addTask,
-  editTask,
+  updateTask,
   updateProjectTimeSpent,
 } from 'app/store/slices';
 import { Config, Task } from 'app/types/types';
@@ -101,7 +101,7 @@ const AddEditTaskForm: FC<AddEditTaskFormProps> = ({
     onSubmit();
 
     task
-      ? dispatch(editTask(updatedTask as Task))
+      ? dispatch(updateTask(updatedTask as Task))
       : dispatch(addTask(newTask));
     const time = isNaN(Number(timeSpent)) ? 0 : timeSpent;
     formData.timeSpent &&

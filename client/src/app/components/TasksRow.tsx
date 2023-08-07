@@ -1,8 +1,13 @@
 import React, { FC } from 'react';
-import { Task } from 'app/types/types';
+import { Config, Task } from 'app/types/types';
 import { setStatusLabelColor } from '../utils/statusColor';
-import { removeTask } from 'app/store/slices';
-import { useAppDispatch } from 'app/custom-hooks';
+import {
+  removeTask,
+  updateProjectTimeSpent,
+  updateTask,
+} from 'app/store/slices';
+import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
+import { convertToMinutes } from 'app/utils';
 
 interface ITasksRowProps {
   task: Task;
@@ -15,12 +20,34 @@ const TasksRow: FC<ITasksRowProps> = ({
   onEditForm,
   setEditTask,
 }) => {
+  const { selectedProject } = useAppSelector<Config>(
+    (state) => state.config
+  );
+  const { id: projectId, timeSpent } = selectedProject;
+  const isDisabled = task.status === 'Done';
   const dispatch = useAppDispatch();
-  const deleteTask = () => dispatch(removeTask(task.id));
+  const deleteTask = () => {
+    const time = isNaN(Number(timeSpent)) ? 0 : timeSpent;
+    dispatch(removeTask(task.id));
+    dispatch(
+      updateProjectTimeSpent({
+        projectId,
+        timeSpent: time - convertToMinutes(task.timeSpent!),
+      })
+    );
+  };
 
   const editTask = () => {
     onEditForm && onEditForm();
     setEditTask && setEditTask(task);
+  };
+
+  const handleCheckboxChange = () => {
+    const updatedTask = {
+      ...task,
+      status: task.status === 'Done' ? 'Pending' : 'Done',
+    };
+    dispatch(updateTask(updatedTask));
   };
 
   return (
@@ -37,7 +64,9 @@ const TasksRow: FC<ITasksRowProps> = ({
                         <input
                           placeholder='checkbox'
                           type='checkbox'
-                          className='focus:opacity-100 checkbox opacity-0 absolute cursor-pointer w-full h-full'
+                          className='focus:opacity-100 checkbox absolute cursor-pointer w-full h-full'
+                          checked={task.status === 'Done'}
+                          onChange={handleCheckboxChange}
                         />
                         <div className='check-icon hidden bg-indigo-700 text-white rounded-sm'>
                           <svg
@@ -116,6 +145,10 @@ const TasksRow: FC<ITasksRowProps> = ({
                         onClick={editTask}
                         role='button'
                         aria-label='option'
+                        className={
+                          isDisabled ? 'cursor-not-allowed' : ''
+                        }
+                        disabled={isDisabled}
                       >
                         <svg
                           xmlns='http://www.w3.org/2000/svg'
