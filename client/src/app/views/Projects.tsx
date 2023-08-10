@@ -5,7 +5,7 @@ import Modal from 'app/components/Modal';
 
 import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
 import AddEditProjectForm from 'app/forms/AddEditProjectForm';
-import { setProjects } from 'app/store/slices';
+import { setProjects, setSelectedSortOption } from 'app/store/slices';
 import { Project } from 'app/types/types';
 import {
   getAllProjects,
@@ -38,6 +38,8 @@ const Projects = () => {
   };
 
   const getProjectsData = async (): Promise<void> => {
+    setSelectedSortOption('latest');
+
     try {
       setIsLoading(true);
       setError('');
@@ -63,6 +65,8 @@ const Projects = () => {
 
   const loadAll = async () => {
     setIstAllLoaded(true);
+    setSelectedSortOption('latest');
+
     try {
       setIsLoading(true);
       setError('');
