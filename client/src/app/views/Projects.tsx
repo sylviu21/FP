@@ -7,7 +7,6 @@ import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
 import AddEditProjectForm from 'app/forms/AddEditProjectForm';
 import { setProjects } from 'app/store/slices';
 import { Project } from 'app/types/types';
-import { sortArray } from 'app/utils';
 import {
   getAllProjects,
   getPageProjects,
@@ -31,10 +30,6 @@ const Projects = () => {
     (state) => state.projects
   );
 
-  const { selectedSortOption } = useAppSelector<{
-    selectedSortOption: string;
-  }>((state) => state.config);
-
   const dispatch = useAppDispatch();
 
   const handleSubmitProject = () => {
@@ -48,13 +43,8 @@ const Projects = () => {
       setError('');
       const { projects: projectsData, isLastPage } =
         await getPageProjects(page);
-      const sortedProjects = sortArray(
-        selectedSortOption,
-        [...projects, ...projectsData],
-        'deadline'
-      );
 
-      dispatch(setProjects(sortedProjects));
+      dispatch(setProjects([...projects, ...projectsData]));
 
       setPage((prevPage) => prevPage + 1);
       setIsLastPage(isLastPage);
@@ -79,13 +69,7 @@ const Projects = () => {
 
       const projectsData = await getAllProjects();
 
-      const sortedProjects = sortArray(
-        selectedSortOption,
-        projectsData,
-        'deadline'
-      );
-
-      dispatch(setProjects(sortedProjects));
+      dispatch(setProjects(projectsData));
     } catch {
       setError('Error getting projects');
     } finally {

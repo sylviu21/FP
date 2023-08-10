@@ -8,7 +8,7 @@ import { Config, Task } from 'app/types/types';
 import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
 import { randomId } from 'app/utils/randomId';
 import TimeSpentField from 'app/components/TimeSpentField';
-import { calculateProjectTimeSpent } from 'app/utils/calculateProjectTimeSpent';
+import { calculateProjectTimeSpent } from 'app/utils/';
 
 interface AddEditTaskFormProps {
   onSubmit: () => void;

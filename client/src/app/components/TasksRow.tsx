@@ -9,7 +9,7 @@ import {
 import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
 import Checkbox from './Checkbox';
 import useSelectedProject from 'app/custom-hooks/useSelectedProject';
-import { calculateProjectTimeSpent } from 'app/utils/calculateProjectTimeSpent';
+import { calculateProjectTimeSpent } from 'app/utils/';
 
 interface ITasksRowProps {
   task: Task;
