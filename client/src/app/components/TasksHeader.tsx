@@ -84,7 +84,7 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
         </button>
         {selectedFilter === 'Pending' && showSort()}
       </div>
-      {selectedProject.isComplete ? (
+      {!selectedProject.isComplete ? (
         <div className='flex justtify-end'>
           <button
             onClick={handleAddForm}

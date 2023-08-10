@@ -31,8 +31,6 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
   const isPastDeadline = targetDate < currentDate;
   const deadlineText = isPastDeadline ? 'Overdue' : 'Due';
 
-  console.log(project.isComplete);
-
   const toggleProjectDetails = (project: Project) => {
     if (selectedProject?.id !== project.id) {
       setSelectedProject(project);
