@@ -57,11 +57,10 @@ describe('AddEditProjectForm', () => {
       target: { value: 'Client 2' },
     });
     fireEvent.change(screen.getByLabelText('Deadline'), {
-      target: { value: '2023-08-10' },
+      target: { value: '2024-08-10' },
     });
 
     fireEvent.click(screen.getByText('Submit'));
-
     expect(onSubmitMock).toHaveBeenCalled();
   });
 

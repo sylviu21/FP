@@ -2,22 +2,63 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import configureMockStore from 'redux-mock-store';
+import { useAppSelector } from 'app/custom-hooks';
 import { Provider } from 'react-redux';
-
 import AddEditTaskForm from './AddEditTaskForm';
 
 const mockStore = configureMockStore([]);
 
+jest.mock('app/custom-hooks', () => ({
+  ...jest.requireActual('app/custom-hooks'),
+  useAppSelector: jest.fn(),
+}));
+
 describe('AddEditTaskForm', () => {
   const onSubmitMock = jest.fn();
+  const mockTasks = [
+    {
+      id: 1,
+      name: 'Task 1',
+      description: 'Description 1',
+      status: 'Pending',
+      dateAdded: '2023-08-01T12:00:00.000Z',
+    },
+    {
+      id: 2,
+      name: 'Task 2',
+      description: 'Description 2',
+      status: 'In Progress',
+      dateAdded: '2023-08-02T12:00:00.000Z',
+    },
+    {
+      id: 3,
+      name: 'Task 3',
+      description: 'Description 3',
+      status: 'Done',
+      dateAdded: '2023-08-03T12:00:00.000Z',
+    },
+  ];
+
+  beforeEach(() => {
+    (useAppSelector as jest.Mock).mockReturnValue({
+      tasks: mockTasks,
+    });
+  });
 
   it('should render the form', () => {
     const store = mockStore({
-      config: {
-        selectedProject: {
+      tasks: [
+        {
           id: 1,
+          name: 'Test Task',
+          description: 'Test Description',
+          status: 'Pending',
+          projectId: 1,
           timeSpent: 0,
         },
+      ],
+      config: {
+        selectedProject: 1,
       },
     });
 
@@ -35,11 +76,18 @@ describe('AddEditTaskForm', () => {
 
   it('should call onSubmit when the form is submitted with valid data', () => {
     const store = mockStore({
-      config: {
-        selectedProject: {
+      tasks: [
+        {
           id: 1,
+          name: 'Test Task',
+          description: 'Test Description',
+          status: 'Pending',
+          projectId: 1,
           timeSpent: 0,
         },
+      ],
+      config: {
+        selectedProject: 1,
       },
     });
 
