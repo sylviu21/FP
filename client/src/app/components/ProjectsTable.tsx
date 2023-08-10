@@ -15,12 +15,16 @@ interface IProjectsTableProps {
   isLoading: boolean;
   isLastPage: boolean;
   error: string;
+  handleSubmitProject: () => void;
+  setEditProject?: (project: Project) => void;
 }
 
 const ProjectsTable: FC<IProjectsTableProps> = ({
   isLoading,
   isLastPage,
   error,
+  handleSubmitProject,
+  setEditProject,
 }) => {
   const [selectedProject, setSelectedProject] =
     useState<Project | null>(null);
@@ -103,6 +107,8 @@ const ProjectsTable: FC<IProjectsTableProps> = ({
               loadingTasks={loadingTasks}
               selectedProject={selectedProject}
               setSelectedProject={setSelectedProject}
+              setIsModalOpen={handleSubmitProject}
+              setEditProject={setEditProject}
             />
           ))}
         </tbody>

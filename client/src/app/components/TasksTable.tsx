@@ -3,13 +3,15 @@ import TasksHeader from './TasksHeader';
 import Pagination from './Pagination';
 import TasksRow from './TasksRow';
 import Modal from './Modal';
+import AddEditTaskForm from 'app/forms/AddEditTaskForm';
+
 import { Task, TASK_STATUS_TYPE } from 'app/types/types';
 import { useAppSelector } from 'app/custom-hooks';
-import AddEditTaskForm from 'app/forms/AddEditTaskForm';
 import { sortArray } from 'app/utils';
 
 interface ITasksTableProps {
   tasks: Task[];
+  handleSubmitProject?: () => void;
 }
 
 const TASKS_PER_PAGE = 4;
@@ -73,6 +75,7 @@ const TasksTable: FC = () => {
 
   const handleAddForm = () => {
     setIsModalOpen(!isModalOpen);
+    setEditTask(null);
   };
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -106,6 +109,10 @@ const TasksTable: FC = () => {
     </button>
   );
 
+  const handleSubmitTask = () => {
+    setIsModalOpen(false);
+  };
+
   const tasksHeaderProps = {
     filterTasks,
     showSort,
@@ -117,7 +124,7 @@ const TasksTable: FC = () => {
     <>
       <TasksHeader {...tasksHeaderProps} />
 
-      <div className='bg-white p-5'>
+      <div className='bg-white p-5' data-testid='tasks-table'>
         <table className='table-fixed w-full'>
           <tbody>
             {currentTasks.map((task) => (
@@ -126,6 +133,7 @@ const TasksTable: FC = () => {
                 task={task}
                 onEditForm={handleAddForm}
                 setEditTask={setEditTask}
+                setSelectedFilter={setSelectedFilter}
               />
             ))}
           </tbody>
@@ -142,10 +150,9 @@ const TasksTable: FC = () => {
         <Modal
           title={editTask ? 'Edit task' : 'Add new task'}
           onClose={() => setIsModalOpen(false)}
-          isOpen={isModalOpen}
         >
           <AddEditTaskForm
-            onSubmit={() => setIsModalOpen(false)}
+            onSubmit={handleSubmitTask}
             task={editTask ? editTask : undefined}
           />
         </Modal>

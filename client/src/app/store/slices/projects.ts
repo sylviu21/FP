@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Project } from '../../types/types';
+import { Project } from 'app/types/types';
 
 const initialState = {
   projects: [],
@@ -10,6 +10,14 @@ const reducers = {
   },
   setProjects(state: {projects: Project[]}, { payload }: PayloadAction<Project[]>) {
     state.projects = payload;
+  },
+  updateProject(state: {projects: Project[]}, { payload }: PayloadAction<Project>) {
+    state.projects = state.projects.map((project) => {
+      if (project.id === payload.id) {
+        return payload;
+      }
+      return project;
+    });
   },
   updateProjectTimeSpent(state: { projects: Project[] }, { payload }: PayloadAction<{ projectId: number; timeSpent: number }>) {
     const { projectId, timeSpent } = payload;
@@ -34,6 +42,7 @@ const projectsSlice = createSlice({
 export const {
   addProject,
   setProjects,
+  updateProject,
   updateProjectTimeSpent,
 } = projectsSlice.actions;
 

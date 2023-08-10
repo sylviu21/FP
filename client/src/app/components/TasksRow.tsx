@@ -7,33 +7,43 @@ import {
   updateTask,
 } from 'app/store/slices';
 import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
-import { convertToMinutes } from 'app/utils';
 import Checkbox from './Checkbox';
+import useSelectedProject from 'app/custom-hooks/useSelectedProject';
+import { calculateProjectTimeSpent } from 'app/utils/calculateProjectTimeSpent';
 
 interface ITasksRowProps {
   task: Task;
   onEditForm?: () => void;
   setEditTask?: (task: Task) => void;
+  setSelectedFilter: (filter: string) => void;
 }
 
 const TasksRow: FC<ITasksRowProps> = ({
   task,
   onEditForm,
   setEditTask,
+  setSelectedFilter,
 }) => {
-  const { selectedProject } = useAppSelector<Config>(
+  const { selectedProjectId } = useAppSelector<Config>(
     (state) => state.config
   );
-  const { id: projectId, timeSpent } = selectedProject;
-  const isDisabled = task.status === 'Done';
+  const { tasks } = useAppSelector<{ tasks: Task[] }>(
+    (state) => state.tasks
+  );
+  const selectedProject = useSelectedProject(selectedProjectId);
+
+  const isDisabled = selectedProject.isComplete;
   const dispatch = useAppDispatch();
   const deleteTask = () => {
-    const time = isNaN(Number(timeSpent)) ? 0 : timeSpent;
     dispatch(removeTask(task.id));
+
+    const updatedTasks = tasks.filter((t) => t.id !== task.id);
+    const updatedTimeSpent = calculateProjectTimeSpent(updatedTasks);
+
     dispatch(
       updateProjectTimeSpent({
-        projectId,
-        timeSpent: time - convertToMinutes(task.timeSpent!),
+        projectId: task.projectId!,
+        timeSpent: updatedTimeSpent,
       })
     );
   };
@@ -44,11 +54,10 @@ const TasksRow: FC<ITasksRowProps> = ({
   };
 
   const handleCheckboxChange = () => {
-    const updatedTask = {
-      ...task,
-      status: task.status === 'Done' ? 'Pending' : 'Done',
-    };
+    const newStatus = task.status === 'Done' ? 'Pending' : 'Done';
+    const updatedTask = { ...task, status: newStatus };
     dispatch(updateTask(updatedTask));
+    setSelectedFilter(newStatus);
   };
 
   return (
@@ -63,6 +72,7 @@ const TasksRow: FC<ITasksRowProps> = ({
                     <Checkbox
                       task={task}
                       onCheckboxChange={handleCheckboxChange}
+                      isComplete={isDisabled}
                     />
                   </td>
                   <td>
@@ -99,6 +109,11 @@ const TasksRow: FC<ITasksRowProps> = ({
                         onClick={deleteTask}
                         role='button'
                         aria-label='option'
+                        data-testid='task-delete-btn'
+                        className={
+                          isDisabled ? 'cursor-not-allowed' : ''
+                        }
+                        disabled={isDisabled}
                       >
                         <svg
                           xmlns='http://www.w3.org/2000/svg'
@@ -123,6 +138,7 @@ const TasksRow: FC<ITasksRowProps> = ({
                         className={
                           isDisabled ? 'cursor-not-allowed' : ''
                         }
+                        data-testid='task-edit-btn'
                         disabled={isDisabled}
                       >
                         <svg

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Timelogger.Entities;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace Timelogger.Api
 {
@@ -47,6 +47,8 @@ namespace Timelogger.Api
         services.AddCors();
       }
     }
+
+
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
@@ -204,11 +206,11 @@ namespace Timelogger.Api
           {
               Id = 13,
               ProjectId = 8,
-              Status = "Done",
+              Status = "Pending",
               Name = "Task 1",
               Description = "Task 1 description",
               DateAdded = new DateTime(2022, 1, 11),
-              TimeSpent = "2h 30m"
+              TimeSpent = ""
           }
 
       };
@@ -222,6 +224,7 @@ namespace Timelogger.Api
             DateAdded = new DateTime(2022, 1, 1),
             Client = "Client 1",
             Deadline = new DateTime(2023, 12, 31),
+            IsComplete = false,
         },
         new Project
         {
@@ -229,7 +232,8 @@ namespace Timelogger.Api
             Name = "Project 2",
             DateAdded =new DateTime(2022, 2, 1),
             Client = "Client 2",
-            Deadline = new DateTime(2022, 3, 1)
+            Deadline = new DateTime(2022, 3, 1),
+            IsComplete = true,
         },
         new Project
         {
@@ -237,56 +241,84 @@ namespace Timelogger.Api
             Name = "Project 3",
             DateAdded = new DateTime(2021, 12, 1),
             Client = "Client 3",
-            Deadline = new DateTime(2022, 1, 15)
+            Deadline = new DateTime(2022, 1, 15),
+            IsComplete = true,
         },
         new Project
         {
-          Id = 4,
-          Name = "Project 4",
-          DateAdded = new DateTime(2022, 3, 1),
-          Client = "Client 4",
-          Deadline = new DateTime(2022, 4, 1)
+            Id = 4,
+            Name = "Project 4",
+            DateAdded = new DateTime(2022, 3, 1),
+            Client = "Client 4",
+            Deadline = new DateTime(2022, 4, 1),
+            IsComplete = true,
         },
 
         new Project
         {
-          Id = 5,
-          Name = "Project 5",
-          DateAdded = new DateTime(2022, 1, 1),
-          Client = "Client 1",
-          Deadline = new DateTime(2023, 12, 31)
+            Id = 5,
+            Name = "Project 5",
+            DateAdded = new DateTime(2022, 1, 1),
+            Client = "Client 1",
+            Deadline = new DateTime(2023, 12, 31),
+            IsComplete = true,
         },
         new Project
         {
-          Id = 6,
-          Name = "Project 6",
-          DateAdded = new DateTime(2022, 2, 1),
-          Client = "Client 2",
-          Deadline = new DateTime(2022, 3, 1)
+            Id = 6,
+            Name = "Project 6",
+            DateAdded = new DateTime(2022, 2, 1),
+            Client = "Client 2",
+            Deadline = new DateTime(2022, 3, 1),
+            IsComplete = true,
         },
         new Project
         {
-          Id = 7,
-          Name = "Project 7",
-          DateAdded = new DateTime(2021, 12, 1),
-          Client = "Client 3",
-          Deadline = new DateTime(2022, 1, 15)
+            Id = 7,
+            Name = "Project 7",
+            DateAdded = new DateTime(2021, 12, 1),
+            Client = "Client 3",
+            Deadline = new DateTime(2022, 1, 15),
+            IsComplete = true,
         },
         new Project
         {
-          Id = 8,
-          Name = "Project 8",
-          DateAdded = new DateTime(2022, 3, 1),
-          Client = "Client 4",
-          Deadline = new DateTime(2022, 4, 1)
+            Id = 8,
+            Name = "Project 8",
+            DateAdded = new DateTime(2022, 3, 1),
+            Client = "Client 4",
+            Deadline = new DateTime(2022, 4, 1),
+            IsComplete = false,
         },
       };
 
-      // Add the projects to the context
-      context.Projects.AddRange(projects);
-      context.Tasks.AddRange(tasks);
+      foreach (var project in projects)
+      {
+        var projectTasks = tasks.Where(t => t.ProjectId == project.Id).ToList();
+        int totalTimeSpent = projectTasks.Sum(t => ParseTimeSpent(t.TimeSpent));
 
+        project.TimeSpent = totalTimeSpent;
+
+        context.Projects.Add(project);
+        context.Tasks.AddRange(projectTasks);
+      }
       context.SaveChanges();
     }
+    private static int ParseTimeSpent(string timeSpent)
+    {
+      if (string.IsNullOrEmpty(timeSpent))
+      {
+        return 0;
+      }
+
+      string[] timeParts = timeSpent.Split(new[] { 'h', 'm' }, StringSplitOptions.RemoveEmptyEntries);
+      if (timeParts.Length == 2 && int.TryParse(timeParts[0], out int hours) && int.TryParse(timeParts[1], out int minutes))
+      {
+        return (hours * 60) + minutes;
+      }
+
+      return 0;
+    }
+
   }
 }

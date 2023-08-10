@@ -1,0 +1,90 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import { Provider } from 'react-redux';
+import configureMockStore from 'redux-mock-store';
+
+import TasksRow from './TasksRow';
+import { useAppSelector } from 'app/custom-hooks';
+
+const mockStore = configureMockStore([]);
+
+jest.mock('app/custom-hooks', () => ({
+  ...jest.requireActual('app/custom-hooks'),
+  useAppSelector: jest.fn(),
+  useAppDispatch: () => jest.fn(),
+  useSelectedProject: jest.fn(),
+}));
+
+describe('TasksRow', () => {
+  const mockTask = {
+    id: 1,
+    name: 'Test Task',
+    description: 'Test Description',
+    timeSpent: '2h 30m',
+    status: 'Done',
+    dateAdded: new Date().toISOString(),
+    projectId: 1,
+  };
+
+  it('should render the task row', () => {
+    const store = mockStore({});
+
+    (useAppSelector as jest.Mock).mockReturnValue({
+      selectedProject: {
+        id: 1,
+        timeSpent: 0,
+        isComplete: false,
+      },
+    });
+    (useSelectedProject as jest.Mock).mockReturnValue({
+      isComplete: false, // Add other properties as needed
+    });
+    render(
+      <Provider store={store}>
+        <TasksRow task={mockTask} />
+      </Provider>
+    );
+
+    expect(screen.getByText('Test Task')).toBeInTheDocument();
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByTestId('task-delete-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('task-edit-btn')).toBeInTheDocument();
+  });
+
+  it('should call deleteTask when delete button is clicked', () => {
+    const store = mockStore({});
+    const mockDeleteTask = jest.fn();
+
+    render(
+      <Provider store={store}>
+        <TasksRow task={mockTask} />
+      </Provider>
+    );
+
+    fireEvent.click(screen.getByTestId('task-delete-btn'));
+
+    expect(mockDeleteTask).toHaveBeenCalledWith(mockTask.id);
+  });
+
+  it('should call onEditForm and setEditTask when edit button is clicked', () => {
+    const store = mockStore({});
+    const mockOnEditForm = jest.fn();
+    const mockSetEditTask = jest.fn();
+
+    render(
+      <Provider store={store}>
+        <TasksRow
+          task={mockTask}
+          onEditForm={mockOnEditForm}
+          setEditTask={mockSetEditTask}
+        />
+      </Provider>
+    );
+
+    fireEvent.click(screen.getByTestId('task-edit-btn'));
+
+    expect(mockOnEditForm).toHaveBeenCalled();
+    expect(mockSetEditTask).toHaveBeenCalledWith(mockTask);
+  });
+});

@@ -1,13 +1,14 @@
 import React, { FC, useState, ChangeEvent, FormEvent } from 'react';
 import {
   addTask,
-  updateTask,
   updateProjectTimeSpent,
+  updateTask,
 } from 'app/store/slices';
 import { Config, Task } from 'app/types/types';
 import { useAppDispatch, useAppSelector } from 'app/custom-hooks';
 import { randomId } from 'app/utils/randomId';
-import { convertToMinutes } from 'app/utils';
+import TimeSpentField from 'app/components/TimeSpentField';
+import { calculateProjectTimeSpent } from 'app/utils/calculateProjectTimeSpent';
 
 interface AddEditTaskFormProps {
   onSubmit: () => void;
@@ -26,20 +27,24 @@ const AddEditTaskForm: FC<AddEditTaskFormProps> = ({
   onSubmit,
   task,
 }) => {
-  const { selectedProject } = useAppSelector<Config>(
+  const { tasks } = useAppSelector<{ tasks: Task[] }>(
+    (state) => state.tasks
+  );
+  const { selectedProjectId: projectId } = useAppSelector<Config>(
     (state) => state.config
   );
-  const { id: projectId, timeSpent } = selectedProject;
-  const [formData, setFormData] = useState<FormTaskValues | Task>(
-    task
-      ? { ...task }
-      : {
-          name: '',
-          description: '',
-          status: 'Pending',
-          projectId: projectId,
-        }
-  );
+
+  const [formData, setFormData] = useState<FormTaskValues>(() => {
+    if (task) {
+      return { ...task };
+    }
+    return {
+      name: '',
+      description: '',
+      status: 'Pending',
+      projectId: projectId,
+    };
+  });
   const [errors, setErrors] = useState<
     Partial<Record<keyof FormTaskValues, string>>
   >({});
@@ -84,34 +89,32 @@ const AddEditTaskForm: FC<AddEditTaskFormProps> = ({
       return;
     }
 
-    const newTask: Task = {
-      id: randomId(),
+    const addEditask: Task = {
+      id: task ? task.id : randomId(),
       dateAdded: new Date().toISOString(),
       ...formData,
     };
 
-    const updatedTask: Task | null = task
-      ? {
-          id: task.id,
-          dateAdded: new Date().toISOString(),
-          ...formData,
-        }
-      : null;
-
     onSubmit();
 
-    task
-      ? dispatch(updateTask(updatedTask as Task))
-      : dispatch(addTask(newTask));
-    const time = isNaN(Number(timeSpent)) ? 0 : timeSpent;
-    formData.timeSpent &&
-      dispatch(
-        updateProjectTimeSpent({
-          projectId,
-          timeSpent: convertToMinutes(formData.timeSpent) + time,
-        })
-      );
+    if (task) {
+      dispatch(updateTask(addEditask));
+    } else {
+      dispatch(addTask(addEditask));
+    }
 
+    const updatedTasks = task
+      ? tasks.map((t) => (t.id === task.id ? addEditask : t))
+      : [...tasks, addEditask];
+
+    const updatedTimeSpent = calculateProjectTimeSpent(updatedTasks);
+
+    dispatch(
+      updateProjectTimeSpent({
+        projectId: tasks[0].projectId!,
+        timeSpent: updatedTimeSpent,
+      })
+    );
     setFormData({
       name: '',
       description: '',
@@ -119,21 +122,6 @@ const AddEditTaskForm: FC<AddEditTaskFormProps> = ({
       timeSpent: undefined,
       projectId: projectId,
     });
-  };
-
-  const handleTimeSpentChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      timeSpent: '',
-    }));
-
-    const { value } = event.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      timeSpent: value,
-    }));
   };
 
   const isTimeSpentValid = (): boolean => {
@@ -241,27 +229,14 @@ const AddEditTaskForm: FC<AddEditTaskFormProps> = ({
         )}
       </div>
 
-      {formData.status === 'Done' ? (
-        <div className='mb-4'>
-          <label
-            className='block text-gray-700 text-sm font-bold mb-2'
-            htmlFor='timeSpent'
-          >
-            Time Spent
-          </label>
-          <input
-            className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500'
-            type='text'
-            id='timeSpent'
-            name='timeSpent'
-            value={formData.timeSpent}
-            onChange={handleTimeSpentChange}
-          />
-          {errors.timeSpent && (
-            <div className='text-red-600'>{errors.timeSpent}</div>
-          )}
-        </div>
-      ) : null}
+      {formData.status === 'Done' && (
+        <TimeSpentField
+          formData={formData}
+          errors={errors}
+          handleChange={handleChange}
+        />
+      )}
+
       <button
         className='w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-indigo-600 transition duration-300'
         type='submit'

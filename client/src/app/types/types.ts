@@ -6,6 +6,7 @@ export interface Project {
   client: string;
   deadline: string;
   timeSpent?: number;
+  isComplete?: boolean;
 }
 
 export interface Task {
@@ -27,5 +28,5 @@ export enum TASK_STATUS_TYPE {
 export type Config = {
   projectOpen: boolean;
   selectedSortOption: string;
-  selectedProject: { id: number; timeSpent: number };
+  selectedProjectId: number;
 }

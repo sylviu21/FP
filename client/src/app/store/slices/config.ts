@@ -4,7 +4,7 @@ import { Config } from 'app/types/types';
 const initialState: Config = {
   projectOpen: false,
   selectedSortOption: 'latest',
-  selectedProject: { id: 0, timeSpent: 0 },
+  selectedProjectId: 0,
 };
 
 const reducers = {
@@ -14,8 +14,8 @@ const reducers = {
   setSelectedSortOption: (state: Config, { payload }: PayloadAction<string>) => {
     state.selectedSortOption = payload;
   },
-  setSelectedProjectDetails: (state: Config, { payload }: PayloadAction<{ id: number; timeSpent: number }>) => {
-    state.selectedProject = payload;
+  setSelectedProjectId: (state: Config, { payload }: PayloadAction<number>) => {
+    state.selectedProjectId = payload;
   },
 };
 
@@ -28,7 +28,7 @@ const configSlice = createSlice({
 export const {
   toggleProjectOpen,
   setSelectedSortOption,
-  setSelectedProjectDetails,
+  setSelectedProjectId,
 } = configSlice.actions;
 
 export const config = configSlice.reducer;

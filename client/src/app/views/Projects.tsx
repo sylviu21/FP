@@ -19,7 +19,11 @@ const Projects = () => {
   const [isAllLoaded, setIstAllLoaded] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
+  const [editProject, setEditProject] = useState<Project | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [error, setError] = useState<string>('');
   const [page, setPage] = useState<number>(1);
 
@@ -33,8 +37,9 @@ const Projects = () => {
 
   const dispatch = useAppDispatch();
 
-  const handleAddProject = () => {
+  const handleSubmitProject = () => {
     setIsModalOpen(!isModalOpen);
+    setEditProject(null);
   };
 
   const getProjectsData = async (): Promise<void> => {
@@ -89,7 +94,6 @@ const Projects = () => {
   };
 
   const handleSearch = async (searchInput: string): Promise<void> => {
-    //create api endpoint for search
     const searchData = await searchProject(searchInput);
     dispatch(setProjects(searchData));
     setIstAllLoaded(true);
@@ -99,6 +103,8 @@ const Projects = () => {
     isLoading,
     isLastPage,
     error,
+    handleSubmitProject,
+    setEditProject,
   };
   return (
     <>
@@ -106,7 +112,7 @@ const Projects = () => {
         <div className='w-1/2'>
           <button
             className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-            onClick={handleAddProject}
+            onClick={handleSubmitProject}
           >
             Add Project
           </button>
@@ -116,12 +122,12 @@ const Projects = () => {
       </div>
       {isModalOpen && (
         <Modal
-          title='Add new project'
+          title={editProject ? 'Edit project' : 'Add new project'}
           onClose={() => setIsModalOpen(false)}
-          isOpen={isModalOpen}
         >
           <AddEditProjectForm
             onSubmit={() => setIsModalOpen(false)}
+            project={editProject ? editProject : undefined}
           />
         </Modal>
       )}

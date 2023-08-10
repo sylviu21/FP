@@ -1,16 +1,17 @@
 import React, { FC, Fragment } from 'react';
-
 import TasksTable from './TasksTable';
 import { Project } from 'app/types/types';
 import { formatTimeSpent } from 'app/utils';
 import { useAppDispatch } from 'app/custom-hooks';
-import { setSelectedProjectDetails } from 'app/store/slices';
+import { setSelectedProjectId } from 'app/store/slices';
 
 interface IProjectsRowProps {
   project: Project;
   loadingTasks: Boolean;
   selectedProject: Project | null;
   setSelectedProject: (project: Project | null) => void;
+  setIsModalOpen: () => void;
+  setEditProject?: (project: Project) => void;
 }
 
 const ProjectsRow: FC<IProjectsRowProps> = ({
@@ -18,6 +19,8 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
   loadingTasks,
   selectedProject,
   setSelectedProject,
+  setIsModalOpen,
+  setEditProject,
 }) => {
   const dispatch = useAppDispatch();
   const targetDate = new Date(
@@ -26,32 +29,62 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
   const currentDate = new Date();
 
   const isPastDeadline = targetDate < currentDate;
-  const deadlineText = isPastDeadline ? 'Ended' : 'Due';
+  const deadlineText = isPastDeadline ? 'Overdue' : 'Due';
 
-  const handleProjectClick = (project: Project) => {
+  console.log('====================================');
+  console.log(project.timeSpent);
+  console.log('====================================');
+
+  const toggleProjectDetails = (project: Project) => {
     if (selectedProject?.id !== project.id) {
       setSelectedProject(project);
-      dispatch(
-        setSelectedProjectDetails({
-          id: project.id!,
-          timeSpent: project.timeSpent!,
-        })
-      );
+      dispatch(setSelectedProjectId(project.id!));
     } else {
       setSelectedProject(null);
     }
   };
 
+  const updateProject = () => {
+    setIsModalOpen && setIsModalOpen();
+    setEditProject && setEditProject(project);
+  };
   return (
     <Fragment key={project.id}>
       <tr>
         <td className=''>
-          <div className='border-2 border-yellow-100 px-5 py-4 rounded bg-green-100 mb-5'>
-            <div className='flex space-x-2 mb-5 hover:cursor-pointer justify-between'>
+          <div
+            className={`${'border-2 border-yellow-100 px-5 py-4 rounded mb-5'} ${
+              project.isComplete
+                ? 'bg-gray-100'
+                : isPastDeadline
+                ? 'bg-red-100'
+                : 'bg-green-100'
+            }`}
+          >
+            <div className='flex space-x-2 mb-5 justify-between'>
               <div className='flex items-left'>
                 <div
-                  className='font-semibold text-2xl'
-                  onClick={() => handleProjectClick(project)}
+                  className='hover:cursor-pointer mb-5'
+                  onClick={() => toggleProjectDetails(project)}
+                >
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    strokeWidth='1.5'
+                    stroke='currentColor'
+                    className='w-6 h-6'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      d='M19.5 8.25l-7.5 7.5-7.5-7.5'
+                    ></path>
+                  </svg>
+                </div>
+                <div
+                  className='font-semibold text-2xl hover:cursor-pointer'
+                  onClick={updateProject}
                 >
                   {project.name}
                 </div>
@@ -63,20 +96,27 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
               <div className='flex justify-end'>
                 <div
                   className={`flex font-semibold text-gray-600${
-                    isPastDeadline ? ' text-red-500' : ''
+                    project.isComplete
+                      ? ' text-green-500'
+                      : isPastDeadline
+                      ? ' text-red-500'
+                      : ' text-grey-500'
                   }`}
                 >
-                  {`${deadlineText}: ${
-                    new Date(project.deadline)
-                      .toISOString()
-                      .split('T')[0]
-                  }`}
+                  {project.isComplete
+                    ? 'Complete'
+                    : `${deadlineText}: ${
+                        new Date(project.deadline)
+                          .toISOString()
+                          .split('T')[0]
+                      }`}
                 </div>
               </div>
             </div>
+
             <div className='flex justify-between mb-3'>
               <div className='flex font-semibold text-gray-600'>
-                {project.timeSpent && project.timeSpent > 0 && (
+                {project.timeSpent && project.timeSpent > 0 ? (
                   <>
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
@@ -94,7 +134,7 @@ const ProjectsRow: FC<IProjectsRowProps> = ({
                     </svg>
                     {formatTimeSpent(project.timeSpent)}
                   </>
-                )}
+                ) : null}
               </div>
             </div>
             {project.timeSpent ? (

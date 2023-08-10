@@ -4,11 +4,13 @@ import { Task } from 'app/types/types';
 interface CheckboxProps {
   task: Task;
   onCheckboxChange: () => void;
+  isComplete: boolean | undefined;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
   task,
   onCheckboxChange,
+  isComplete,
 }) => {
   return (
     <div className='ml-5'>
@@ -19,6 +21,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
           className='focus:opacity-100 checkbox absolute cursor-pointer w-full h-full'
           checked={task.status === 'Done'}
           onChange={onCheckboxChange}
+          disabled={isComplete}
         />
         <div className='check-icon hidden bg-indigo-700 text-white rounded-sm'>
           <svg

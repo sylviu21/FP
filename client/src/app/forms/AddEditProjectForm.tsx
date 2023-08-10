@@ -1,11 +1,12 @@
 import React, { FC, useState, ChangeEvent, FormEvent } from 'react';
-import { addProject } from 'app/store/slices';
+import { addProject, updateProject } from 'app/store/slices';
 import { Project } from 'app/types/types';
 import { useAppDispatch } from 'app/custom-hooks';
 import { randomId } from 'app/utils/randomId';
 
 interface AddEditProjectFormProps {
   onSubmit: () => void;
+  project?: Project;
 }
 
 interface FormProjectValues
@@ -18,12 +19,23 @@ interface FormProjectValues
 
 const AddEditProjectForm: FC<AddEditProjectFormProps> = ({
   onSubmit,
+  project,
 }) => {
-  const [formData, setFormData] = useState<FormProjectValues>({
-    name: '',
-    description: '',
-    client: 'Client 1',
-    deadline: '',
+  const [formData, setFormData] = useState<FormProjectValues>(() => {
+    if (project) {
+      return {
+        ...project,
+        deadline: new Date(project.deadline)
+          .toISOString()
+          .slice(0, 10),
+      };
+    }
+    return {
+      name: '',
+      description: '',
+      client: 'Client 1',
+      deadline: '',
+    };
   });
   const [errors, setErrors] = useState<
     Partial<Record<keyof FormProjectValues, string>>
@@ -79,9 +91,19 @@ const AddEditProjectForm: FC<AddEditProjectFormProps> = ({
       ...formData,
     };
 
+    const updatedProject: Project | null = project
+      ? {
+          id: project.id,
+          dateAdded: new Date().toISOString(),
+          ...formData,
+        }
+      : null;
+
     onSubmit();
 
-    dispatch(addProject(newProject));
+    project
+      ? dispatch(updateProject(updatedProject as Project))
+      : dispatch(addProject(newProject));
 
     setFormData({
       name: '',

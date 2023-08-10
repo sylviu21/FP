@@ -1,4 +1,7 @@
 import React, { FC } from 'react';
+import { useAppSelector } from 'app/custom-hooks';
+import { Config } from 'app/types/types';
+import useSelectedProject from 'app/custom-hooks/useSelectedProject';
 
 interface ITasksHeaderProps {
   filterTasks: (status: string) => void;
@@ -13,6 +16,11 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
   handleAddForm,
   selectedFilter,
 }) => {
+  const { selectedProjectId: projectId } = useAppSelector<Config>(
+    (state) => state.config
+  );
+  const selectedProject = useSelectedProject(projectId);
+
   return (
     <div className='sm:flex items-center justify-between bg-grey-500 mt-5'>
       <div className='flex'>
@@ -40,9 +48,10 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
             }`}
           >
             <p>Done</p>
-            {selectedFilter === 'Done' && showSort()}
           </div>
         </button>
+        {selectedFilter === 'Done' && showSort()}
+
         <button
           className='ml-4 sm:ml-8'
           onClick={() => filterTasks('In Progress')}
@@ -55,9 +64,10 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
             }`}
           >
             <p>In Progress</p>
-            {selectedFilter === 'In Progress' && showSort()}
           </div>
         </button>
+        {selectedFilter === 'In Progress' && showSort()}
+
         <button
           className='ml-4 sm:ml-8'
           onClick={() => filterTasks('Pending')}
@@ -70,20 +80,22 @@ const TasksHeader: FC<ITasksHeaderProps> = ({
             } `}
           >
             <p>Pending</p>
-            {selectedFilter === 'Pending' && showSort()}
           </div>
         </button>
+        {selectedFilter === 'Pending' && showSort()}
       </div>
-      <div className='flex justtify-end'>
-        <button
-          onClick={handleAddForm}
-          className='mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded ml-5'
-        >
-          <p className='text-sm font-medium leading-none text-white'>
-            Add Task
-          </p>
-        </button>
-      </div>
+      {selectedProject.isComplete ? (
+        <div className='flex justtify-end'>
+          <button
+            onClick={handleAddForm}
+            className='mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded ml-5'
+          >
+            <p className='text-sm font-medium leading-none text-white'>
+              Add Task
+            </p>
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 };

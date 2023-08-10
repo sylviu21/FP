@@ -28,6 +28,7 @@ const Pagination: FC<IPaginationProps> = ({
               current === 1 ? 'cursor-not-allowed' : ''
             }`}
             disabled={current === 1}
+            data-testid='prev-page-btn'
           >
             <svg className='w-4 h-4 fill-current' viewBox='0 0 20 20'>
               <path
@@ -59,6 +60,7 @@ const Pagination: FC<IPaginationProps> = ({
               current === total ? 'cursor-not-allowed' : ''
             }`}
             disabled={current === total}
+            data-testid='next-page-btn'
           >
             <svg className='w-4 h-4 fill-current' viewBox='0 0 20 20'>
               <path

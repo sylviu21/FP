@@ -10,6 +10,6 @@ namespace Timelogger.Entities
 		public string Client { get; set; }
 		public DateTime Deadline { get; set; }
 		public int TimeSpent { get; set; }
-
+		public bool IsComplete { get; set; }
 	}
 }
